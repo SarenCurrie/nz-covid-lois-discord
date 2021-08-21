@@ -34,11 +34,9 @@ fun buildEmbed(
                 )
             )
             .setDescription(location.event)
-            .addField(WebhookEmbed.EmbedField(true, "City", location.city ?: "N/A"))
             .addField(WebhookEmbed.EmbedField(true, "Address", location.location ?: "N/A"))
             .addField(WebhookEmbed.EmbedField(true, "Start", location.start))
             .addField(WebhookEmbed.EmbedField(true, "End", location.end))
-            .addField(WebhookEmbed.EmbedField(false, "Information", location.information))
     } catch (e: Exception) {
         println(location)
         throw e
