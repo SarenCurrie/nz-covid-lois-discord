@@ -56,8 +56,8 @@ fun checkLocations() {
     }
     print("Sending ${newLocations.size} new locations and ${updatedLocations.size} updated locations")
     val client = WebhookClient.withUrl(System.getenv("WEBHOOK_URL"))
-    newLocations.chunked(10).map { client.send(it.map { l -> buildEmbed(l, false) }) }
-    updatedLocations.chunked(10).map { client.send(it.map { l -> buildEmbed(l, true) }) }
+    newLocations.chunked(10).map { client.send(it.map { l -> buildEmbed(l, false) }) }.forEach{ it.get() }
+    updatedLocations.chunked(10).map { client.send(it.map { l -> buildEmbed(l, true) }) }.forEach{ it.get() }
     client.close()
     print("Sent ${newLocations.size} new locations and ${updatedLocations.size} updated locations")
 }
