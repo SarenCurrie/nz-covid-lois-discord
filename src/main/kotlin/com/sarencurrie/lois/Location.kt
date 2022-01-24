@@ -11,6 +11,12 @@ data class Location(
     val latitude: String?,
     val longitude: String?
 ) {
+    val omicron: Boolean
+        get() = information.contains("omicron") || information.contains("Omicron")
+
+    val auckland: Boolean
+        get() = city?.equals("Auckland") ?: false
+
     override fun equals(other: Any?): Boolean {
         return other != null
                 && other is Location

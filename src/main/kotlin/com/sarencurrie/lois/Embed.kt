@@ -8,15 +8,32 @@ private val NEW_COLOUR = 0x11cf73
 
 private val MOH_WEBSITE = "https://www.health.govt.nz/our-work/diseases-and-conditions/covid-19-novel-coronavirus/covid-19-health-advice-public/contact-tracing-covid-19/covid-19-contact-tracing-locations-interest"
 
+private enum class Colors(val rgb: Int) {
+    UPDATE(0x2711cf),
+    AUCKLAND(0xe8bd54),
+    OMICRON(0x541b16),
+    DEFAULT(0x11cf73),
+}
+
 fun buildNewEmbed(
     location: Location,
 ): WebhookEmbed {
     val builder = WebhookEmbedBuilder()
     return try {
+        val color = if (location.auckland) {
+            if (location.omicron) {
+                Colors.OMICRON
+            } else {
+                Colors.AUCKLAND
+            }
+        } else {
+            Colors.DEFAULT
+        }
+
         builder
-            .setColor(NEW_COLOUR)
+            .setColor(color.rgb)
             .setTitle(
-                WebhookEmbed.EmbedTitle("New location of interest", MOH_WEBSITE)
+                WebhookEmbed.EmbedTitle("New location of interest", null)
             )
             .setAuthor(
                 WebhookEmbed.EmbedAuthor(
@@ -29,7 +46,10 @@ fun buildNewEmbed(
             .addField(WebhookEmbed.EmbedField(true, "Address", location.location ?: "N/A"))
             .addField(WebhookEmbed.EmbedField(true, "Start", location.start))
             .addField(WebhookEmbed.EmbedField(true, "End", location.end))
-            .build()
+            if (location.omicron) {
+                builder.addField(WebhookEmbed.EmbedField(true, "Variant", "Omicron"))
+            }
+            builder.build()
     } catch (e: Exception) {
         println(location)
         throw e

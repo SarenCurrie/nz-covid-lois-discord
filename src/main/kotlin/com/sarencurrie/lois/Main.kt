@@ -23,7 +23,7 @@ fun checkLocations() {
     val stream = HttpClient.newHttpClient()
         .send(HttpRequest.newBuilder(url.toURI()).GET().build(), HttpResponse.BodyHandlers.ofInputStream())
     val data = CSVFormat.DEFAULT.builder()
-        .setHeader("id", "Event", "Location", "City", "Start", "End", "Information", "LAT", "LNG")
+        .setHeader("id", "Event", "Location", "City", "Start", "End", "Advice", "LAT", "LNG")
         .build()
         .parse(InputStreamReader(stream.body()))
     val newLocations = mutableListOf<Location>()
@@ -38,7 +38,7 @@ fun checkLocations() {
             it.get("City"),
             it.get("Start"),
             it.get("End"),
-            it.get("Information"),
+            it.get("Advice"),
             it.get("LAT"),
             it.get("LNG")
         )
