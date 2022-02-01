@@ -3,7 +3,6 @@ package com.sarencurrie.lois
 import club.minnced.discord.webhook.WebhookClient
 import org.apache.commons.csv.CSVFormat
 import java.io.InputStreamReader
-import java.lang.System.exit
 import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -16,42 +15,23 @@ fun main() {
 }
 
 fun checkLocations() {
-    val url =
-        URL("https://raw.githubusercontent.com/minhealthnz/nz-covid-data/main/locations-of-interest/august-2021/locations-of-interest.csv")
     val db = DynamoDbWrapper()
-    val locations = db.getAllLocations()
-    val stream = HttpClient.newHttpClient()
-        .send(HttpRequest.newBuilder(url.toURI()).GET().build(), HttpResponse.BodyHandlers.ofInputStream())
-    val data = CSVFormat.DEFAULT.builder()
-        .setHeader("id", "Event", "Location", "City", "Start", "End", "Advice", "LAT", "LNG")
-        .build()
-        .parse(InputStreamReader(stream.body()))
+    val previousLocations = db.getAllLocations()
+
     val newLocations = mutableListOf<Location>()
     val updatedLocations = mutableListOf<Location>()
 
-    data.forEach {
-        val id = it.get("id")
-        val location = Location(
-            id,
-            it.get("Event"),
-            it.get("Location"),
-            it.get("City"),
-            it.get("Start"),
-            it.get("End"),
-            it.get("Advice"),
-            it.get("LAT"),
-            it.get("LNG")
-        )
-        if (locations.containsKey(id)) {
-            if (locations[id] != location) {
+    CsvLocationReader().getLocations().forEach {
+        if (previousLocations.containsKey(it.id)) {
+            if (previousLocations[it.id] != it) {
                 // Update
-                db.store(location)
-                updatedLocations.add(location)
+                db.store(it)
+                updatedLocations.add(it)
             }
         } else {
             // New
-            db.store(location)
-            newLocations.add(location)
+            db.store(it)
+            newLocations.add(it)
         }
     }
     print("Sending ${newLocations.size} new locations and ${updatedLocations.size} updated locations")
